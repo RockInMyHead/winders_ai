@@ -2,6 +2,10 @@ from typing import List
 
 import uvicorn
 from fastapi import FastAPI
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
