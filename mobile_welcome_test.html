@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мобильная версия Welcome</title>
+    <link rel="stylesheet" href="http://72.56.66.107:8000/static/style.css?v=20251027-05">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+        .demo-container {
+            max-width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        .responsive-note {
+            background: #f0f9ff;
+            border: 1px solid #20993b;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 16px 0;
+            font-size: 14px;
+            color: #20993b;
+        }
+        .device-simulator {
+            border: 2px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 20px;
+            background: #fff;
+            position: relative;
+        }
+        .device-simulator::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1 style="color: #20993b; text-align: center; margin-bottom: 20px;">📱 Мобильная версия Welcome секции</h1>
+
+        <div class="responsive-note">
+            <strong>📋 Инструкция:</strong><br>
+            • Измените размер окна браузера или откройте на мобильном устройстве<br>
+            • На экранах < 768px: модели в столбец<br>
+            • На экранах < 640px: компактная верстка<br>
+            • На экранах < 480px: сверхкомпактная верстка
+        </div>
+
+        <div class="device-simulator">
+            <!-- Welcome Message -->
+            <div id="welcome-message" class="welcome-message text-center fade-in">
+                <div class="welcome-icon mb-4">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L13.09 8.26L22.5 9L15.5 15.74L18.18 24.02L12 20.77L5.82 24.02L8.5 15.74L1.5 9L10.91 8.26L12 2Z" fill="url(#starGradient)" stroke="var(--primary-green)" stroke-width="0.5"/>
+                        <defs>
+                            <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:var(--primary-green);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:var(--primary-green-light);stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h2 class="gradient-text mb-3">Добро пожаловать в WIndexsAI</h2>
+                <p class="text-muted mb-5">Выберите модель для начала работы</p>
+
+                <!-- Classic Models Section -->
+                <div class="classic-models-section mb-5">
+                    <h4 class="mb-3">Классические модели</h4>
+                    <div class="model-cards d-flex gap-4 justify-content-center">
+                        <div class="model-card card" data-model="gpt-4o-mini">
+                            <div class="card-body text-center">
+                                <h3 class="mb-3">WindexsAI Lite</h3>
+                                <p class="text-muted mb-4">Быстрая и эффективная модель для повседневных задач</p>
+                                <div class="capabilities d-flex flex-wrap gap-2 justify-content-center">
+                                    <span class="capability btn btn-outline btn-sm">Текст</span>
+                                    <span class="capability btn btn-outline btn-sm">Код</span>
+                                    <span class="capability btn btn-outline btn-sm">Анализ</span>
+                                    <span class="capability btn btn-outline btn-sm">Перевод</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="model-card card pro-model" data-model="gpt-4o">
+                            <div class="pro-badge">Подписка Pro</div>
+                            <div class="card-body text-center">
+                                <h3 class="mb-3">WindexsAI Pro</h3>
+                                <p class="text-muted mb-4">Продвинутая модель с расширенными возможностями</p>
+                                <div class="capabilities d-flex flex-wrap gap-2 justify-content-center">
+                                    <span class="capability btn btn-outline btn-sm">Текст</span>
+                                    <span class="capability btn btn-outline btn-sm">Код</span>
+                                    <span class="capability btn btn-outline btn-sm">Анализ</span>
+                                    <span class="capability btn btn-outline btn-sm">Перевод</span>
+                                    <span class="capability btn btn-outline btn-sm">Креативность</span>
+                                    <span class="capability btn btn-outline btn-sm">Логика</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="mb-3">Специализированные AI-ассистенты</h4>
+                <p class="text-muted mb-4">Выберите специализированного AI-ассистента для ваших задач</p>
+
+                <!-- AI Specialists Gallery -->
+                <div class="ai-specialists-gallery">
+                    <div class="specialists-container">
+                        <button class="scroll-btn scroll-left" onclick="scrollSpecialists('left')">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="specialists-grid" id="specialistsGrid">
+                            <!-- Ментор -->
+                            <div class="specialist-card card" data-specialist="mentor" data-model="gpt-4o">
+                                <div class="card-body text-center">
+                                    <div class="specialist-icon mb-3">🎓</div>
+                                    <h3 class="mb-2">AI Ментор</h3>
+                                    <p class="text-muted mb-3">Персональный наставник для развития навыков и карьеры</p>
+                                    <div class="specialist-skills">
+                                        <span class="skill-tag">Карьерное планирование</span>
+                                        <span class="skill-tag">Обучение</span>
+                                        <span class="skill-tag">Мотивация</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Программист -->
+                            <div class="specialist-card card" data-specialist="programmer" data-model="gpt-4o">
+                                <div class="card-body text-center">
+                                    <div class="specialist-icon mb-3">💻</div>
+                                    <h3 class="mb-2">AI Программист</h3>
+                                    <p class="text-muted mb-3">Эксперт по разработке и техническим решениям</p>
+                                    <div class="specialist-skills">
+                                        <span class="skill-tag">Кодинг</span>
+                                        <span class="skill-tag">Архитектура</span>
+                                        <span class="skill-tag">Отладка</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Аналитик -->
+                            <div class="specialist-card card" data-specialist="analyst" data-model="gpt-4o">
+                                <div class="card-body text-center">
+                                    <div class="specialist-icon mb-3">📈</div>
+                                    <h3 class="mb-2">AI Аналитик</h3>
+                                    <p class="text-muted mb-3">Специалист по анализу данных и бизнес-процессов</p>
+                                    <div class="specialist-skills">
+                                        <span class="skill-tag">Анализ данных</span>
+                                        <span class="skill-tag">Статистика</span>
+                                        <span class="skill-tag">Прогнозирование</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="scroll-btn scroll-right" onclick="scrollSpecialists('right')">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; font-size: 12px; color: #666; text-align: center;">
+            Размер экрана: <span id="screen-size"></span>px
+        </div>
+    </div>
+
+    <script>
+        // Показываем текущий размер экрана
+        function updateScreenSize() {
+            document.getElementById('screen-size').textContent = window.innerWidth;
+        }
+
+        updateScreenSize();
+        window.addEventListener('resize', updateScreenSize);
+
+        // Функция для скролла специалистов (заглушка)
+        function scrollSpecialists(direction) {
+            const grid = document.getElementById('specialistsGrid');
+            const scrollAmount = direction === 'left' ? -280 : 280;
+            grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

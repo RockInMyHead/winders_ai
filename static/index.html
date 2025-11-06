@@ -73,10 +73,10 @@
         <header class="unified-header">
             <div class="header-container">
 
-                <a href="/" class="header-logo">
+                <div class="header-logo">
                     <img src="/static/round_logo-07.svg" alt="WindexsAI" width="32" height="32">
                     <span class="logo-text">WindexsAI</span>
-                </a>
+                </div>
 
                 <nav class="header-nav">
                     <div class="nav-links">
@@ -86,6 +86,53 @@
                 </nav>
 
                 <div class="header-actions">
+                    <!-- Личный кабинет для авторизованного пользователя -->
+                    <div id="user-profile" class="user-profile hidden">
+                        <div class="user-menu">
+                            <button class="user-menu-trigger" id="user-menu-trigger">
+                                <div class="user-avatar">
+                                    <span id="user-avatar-letter">U</span>
+                                </div>
+                                <span id="user-display-name">Пользователь</span>
+                                <span class="dropdown-arrow">▼</span>
+                            </button>
+                            <div class="user-dropdown" id="user-dropdown">
+                                <div class="user-info">
+                                    <div class="user-avatar-large">
+                                        <span id="user-avatar-letter-large">U</span>
+                                    </div>
+                                    <div class="user-details">
+                                        <div id="user-full-name" class="user-name">Пользователь</div>
+                                        <div id="user-email" class="user-email">user@example.com</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" id="pricing-link">
+                                    Обновить план
+                                </a>
+                                <a href="#" class="dropdown-item" id="personalization-link">
+                                    Персонализация
+                                </a>
+                                <a href="/pricing" class="dropdown-item">
+                                    Настройки
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item logout-btn" id="logout-btn">
+                                    Выйти
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Кнопки входа/регистрации для неавторизованных пользователей -->
+                    <div id="auth-buttons" class="auth-buttons">
+                        <button class="btn btn-outline" id="login-btn">
+                            Войти
+                        </button>
+                        <button class="btn btn-primary" id="register-btn">
+                            Регистрация
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -126,13 +173,11 @@
                 <div id="chat-container" class="chat-container flex-grow-1">
                     <!-- Welcome Message -->
                     <div id="welcome-message" class="welcome-message text-center fade-in">
-                        <div class="welcome-icon mb-4"></div>
                         <h2 class="gradient-text mb-3">Добро пожаловать в WIndexsAI</h2>
                         <p class="text-muted mb-5">Выберите модель для начала работы</p>
 
                         <!-- Classic Models Section -->
                         <div class="classic-models-section mb-5">
-                            <h4 class="mb-3">Классические модели</h4>
                             <div class="model-cards d-flex gap-4 justify-content-center">
                                 <div class="model-card card" data-model="gpt-4o-mini">
                                     <div class="card-body text-center">
@@ -164,105 +209,6 @@
                             </div>
                         </div>
 
-                        <h4 class="mb-3">Специализированные AI-ассистенты</h4>
-                        <p class="text-muted mb-4">Выберите специализированного AI-ассистента для ваших задач</p>
-
-                        <!-- AI Specialists Gallery -->
-                        <div class="ai-specialists-gallery">
-                            <div class="specialists-container">
-                                <button class="scroll-btn scroll-left" onclick="scrollSpecialists('left')">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <div class="specialists-grid" id="specialistsGrid">
-                                <!-- Ментор -->
-                                <div class="specialist-card card" data-specialist="mentor" data-model="gpt-4o">
-                                    <div class="card-body text-center">
-                                        <div class="specialist-icon mb-3">🎓</div>
-                                        <h3 class="mb-2">AI Ментор</h3>
-                                        <p class="text-muted mb-3">Персональный наставник для развития навыков и карьеры</p>
-                                        <div class="specialist-skills">
-                                            <span class="skill-tag">Карьерное планирование</span>
-                                            <span class="skill-tag">Обучение</span>
-                                            <span class="skill-tag">Мотивация</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Психолог -->
-                                <div class="specialist-card card" data-specialist="psychologist" data-model="gpt-4o">
-                                    <div class="card-body text-center">
-                                        <div class="specialist-icon mb-3">🧠</div>
-                                        <h3 class="mb-2">AI Психолог</h3>
-                                        <p class="text-muted mb-3">Поддержка психического здоровья и эмоционального благополучия</p>
-                                        <div class="specialist-skills">
-                                            <span class="skill-tag">Стресс-менеджмент</span>
-                                            <span class="skill-tag">Эмоции</span>
-                                            <span class="skill-tag">Саморазвитие</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Программист -->
-                                <div class="specialist-card card" data-specialist="programmer" data-model="gpt-4o">
-                                    <div class="card-body text-center">
-                                        <div class="specialist-icon mb-3">💻</div>
-                                        <h3 class="mb-2">AI Программист</h3>
-                                        <p class="text-muted mb-3">Эксперт по разработке и техническим решениям</p>
-                                        <div class="specialist-skills">
-                                            <span class="skill-tag">Кодинг</span>
-                                            <span class="skill-tag">Архитектура</span>
-                                            <span class="skill-tag">Отладка</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Бухгалтер -->
-                                <div class="specialist-card card" data-specialist="accountant" data-model="gpt-4o-mini">
-                                    <div class="card-body text-center">
-                                        <div class="specialist-icon mb-3">📊</div>
-                                        <h3 class="mb-2">AI Бухгалтер</h3>
-                                        <p class="text-muted mb-3">Финансовый консультант и эксперт по учету</p>
-                                        <div class="specialist-skills">
-                                            <span class="skill-tag">Финансы</span>
-                                            <span class="skill-tag">Налоги</span>
-                                            <span class="skill-tag">Отчетность</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Аналитик -->
-                                <div class="specialist-card card" data-specialist="analyst" data-model="gpt-4o">
-                                    <div class="card-body text-center">
-                                        <div class="specialist-icon mb-3">📈</div>
-                                        <h3 class="mb-2">AI Аналитик</h3>
-                                        <p class="text-muted mb-3">Специалист по анализу данных и бизнес-процессов</p>
-                                        <div class="specialist-skills">
-                                            <span class="skill-tag">Анализ данных</span>
-                                            <span class="skill-tag">Статистика</span>
-                                            <span class="skill-tag">Прогнозирование</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Универсальный -->
-                                <div class="specialist-card card" data-specialist="general" data-model="gpt-4o-mini">
-                                    <div class="card-body text-center">
-                                        <div class="specialist-icon mb-3"></div>
-                                        <h3 class="mb-2">Универсальный AI</h3>
-                                        <p class="text-muted mb-3">Многофункциональный помощник для любых задач</p>
-                                        <div class="specialist-skills">
-                                            <span class="skill-tag">Общие вопросы</span>
-                                            <span class="skill-tag">Творчество</span>
-                                            <span class="skill-tag">Помощь</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                </div>
-                                <button class="scroll-btn scroll-right" onclick="scrollSpecialists('right')">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Chat Messages -->
@@ -299,9 +245,8 @@
                             <!-- Кнопка с выдвижным меню -->
                             <div class="dropdown-menu-container" style="position: relative !important; display: inline-block !important;">
                                 <button id="tools-btn" class="btn btn-outline" title="Инструменты" style="position: relative; z-index: 100;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
                                     </svg>
                                 </button>
 
@@ -316,24 +261,15 @@
                                 </div>
                             </div>
                             
-                            <!-- Voice Button -->
-                            <button id="voice-btn" class="btn btn-outline" title="Голосовое сообщение">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <!-- Universal Action Button -->
+                            <button id="action-btn" class="btn btn-outline" title="Голосовое сообщение">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
                                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                    <line x1="12" y1="19" x2="12" y2="22"></line>
-                                    <line x1="8" y1="22" x2="16" y2="22"></line>
+                                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                                    <line x1="8" y1="23" x2="16" y2="23"></line>
                                 </svg>
                             </button>
-                            <button id="send-btn" class="btn btn-primary btn-sm" disabled>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                                    <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="input-footer d-flex justify-content-between align-items-center mt-2">
-                            <span class="char-count text-muted">0/12000</span>
                         </div>
                     </div>
                 </div>
@@ -357,7 +293,7 @@
         <div class="connect-modal-content card">
             <div class="card-header">
                 <div class="d-flex align-items-center justify-content-between">
-                    <h2 class="mb-0">☁️ Подключение к облаку</h2>
+                    <h2 class="mb-0">Подключение к облаку</h2>
                     <button class="close-connect btn btn-outline" title="Закрыть">×</button>
                 </div>
             </div>
@@ -387,10 +323,6 @@
                     <div class="mt-3">
                         <p class="text-muted small mb-2">Нет аккаунта в облаке?</p>
                         <a href="https://cloud.windexai.com/register" target="_blank" class="btn btn-outline btn-sm">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
-                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                            </svg>
                             Зарегистрироваться в облаке
                         </a>
                     </div>
@@ -411,17 +343,9 @@
 
                 <div class="d-flex gap-3">
                     <button id="test-connection-btn" class="btn btn-primary flex-fill">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                            <polyline points="22,4 12,14.01 9,11.01"></polyline>
-                        </svg>
                         Проверить подключение к облаку
                     </button>
                     <button id="connect-btn-modal" class="btn btn-success flex-fill" disabled>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
-                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                        </svg>
                         Подключиться к облаку
                     </button>
                 </div>
@@ -433,7 +357,6 @@
     <div id="agreement-modal" class="modal hidden">
       <div class="modal-overlay" id="agreement-overlay"></div>
       <div class="modal-content">
-        <button class="modal-close" id="agreement-close">&times;</button>
         <h2>Пользовательское соглашение</h2>
         <div class="modal-body">
           <p>1. Общие положения</p>
@@ -468,6 +391,168 @@
           <p>По вопросам Соглашения обращайтесь: support@windexsai.com.</p>
         </div>
       </div>
+    </div>
+
+    <!-- Personalization Modal -->
+    <div id="personalization-modal" class="connect-modal hidden">
+        <div class="connect-modal-content card" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+            <div class="card-header">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0">🎨 Базовый стиль и тон</h2>
+                    <button class="close-personalization btn btn-outline" title="Закрыть">×</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">Укажите стиль и тон, который ChatGPT будет использовать при ответе.</p>
+
+                <div class="personalization-section mb-4">
+                    <h4 class="mb-3">По умолчанию</h4>
+                    <p class="text-muted mb-3">Выберите стиль общения, который будет использоваться по умолчанию для всех ваших разговоров.</p>
+
+                    <div class="style-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 2rem;">
+                        <div class="style-option selected" data-style="default" style="background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                            <div class="style-name" style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">По умолчанию</div>
+                            <div class="style-example" style="font-size: 0.8rem; opacity: 0.7;">Стандартный стиль</div>
+                        </div>
+
+                        <div class="style-option" data-style="chatty" style="background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                            <div class="style-name" style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Болтливый</div>
+                            <div class="style-example" style="font-size: 0.8rem; opacity: 0.7;">Дружелюбный</div>
+                        </div>
+
+                        <div class="style-option" data-style="witty" style="background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                            <div class="style-name" style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Остроумный</div>
+                            <div class="style-example" style="font-size: 0.8rem; opacity: 0.7;">С юмором</div>
+                        </div>
+
+                        <div class="style-option" data-style="direct" style="background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                            <div class="style-name" style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Откровенный</div>
+                            <div class="style-example" style="font-size: 0.8rem; opacity: 0.7;">Прямолинейный</div>
+                        </div>
+
+                        <div class="style-option" data-style="encouraging" style="background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                            <div class="style-name" style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Ободряющий</div>
+                            <div class="style-example" style="font-size: 0.8rem; opacity: 0.7;">Поддерживающий</div>
+                        </div>
+
+                        <div class="style-option" data-style="genz" style="background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                            <div class="style-name" style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem;">Поколение Z</div>
+                            <div class="style-example" style="font-size: 0.8rem; opacity: 0.7;">Современный сленг</div>
+                        </div>
+                    </div>
+
+                    <div class="custom-instructions mb-4">
+                        <h5 class="mb-2">Пользовательские инструкции</h5>
+                        <textarea class="form-control" rows="3" placeholder="Например: 'Отвечай как опытный программист с 10-летним стажем...'"></textarea>
+                    </div>
+                </div>
+
+                <div class="personalization-section mb-4">
+                    <h4 class="mb-3">👤 Псевдоним</h4>
+                    <input type="text" class="form-control mb-3" placeholder="Введите ваш псевдоним">
+                </div>
+
+                <div class="personalization-section mb-4">
+                    <h4 class="mb-3">💼 Профессия</h4>
+                    <input type="text" class="form-control mb-3" placeholder="Например: Разработчик, дизайнер, менеджер...">
+                </div>
+
+                <div class="personalization-section mb-4">
+                    <h4 class="mb-3">📖 Больше о вас</h4>
+                    <textarea class="form-control" rows="4" placeholder="Расскажите о ваших интересах, хобби, опыте работы..."></textarea>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-end">
+                    <button class="btn btn-outline close-personalization">Отмена</button>
+                    <button class="btn btn-primary" onclick="savePersonalization()">Сохранить настройки</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Modal -->
+    <div id="pricing-modal" class="connect-modal hidden">
+        <div class="connect-modal-content card" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div class="card-header">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="mb-0">💰 Тарифы WindexsAI</h2>
+                    <button class="close-pricing btn btn-outline" title="Закрыть">×</button>
+                </div>
+                <p class="text-muted mt-2 mb-0">Выберите подходящий план для ваших задач</p>
+            </div>
+            <div class="card-body">
+                <div class="pricing-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                    <!-- Free Plan -->
+                    <div class="pricing-card" style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 2rem; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                        <div class="plan-badge" style="background: #20993b; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-bottom: 1rem;">Бесплатно</div>
+                        <h3 class="plan-name" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Lite</h3>
+                        <div class="plan-price" style="font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem;">
+                            <span class="currency">₽</span>
+                            <span class="amount">0</span>
+                        </div>
+                        <ul class="features-list" style="list-style: none; padding: 0; margin: 0 0 2rem 0; text-align: left;">
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> WindexAI Lite модель</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> 100 запросов/день</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> История чатов</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> Генератор сайтов</li>
+                            <li style="padding: 0.5rem 0;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> Деплой на поддомене</li>
+                        </ul>
+                        <button class="btn btn-outline plan-btn" onclick="selectPlan('free')" style="width: 100%; padding: 0.75rem; border-radius: 8px;">
+                            Текущий план
+                        </button>
+                    </div>
+
+                    <!-- Plus Plan -->
+                    <div class="pricing-card plus-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 2rem; text-align: center; position: relative; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);">
+                        <div class="popular-badge" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #ff6b6b; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">Популярный</div>
+                        <div class="plan-badge" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-bottom: 1rem;">Стандарт</div>
+                        <h3 class="plan-name" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Plus</h3>
+                        <div class="plan-price" style="font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem;">
+                            <span class="currency">₽</span>
+                            <span class="amount">990</span>
+                            <span class="period" style="font-size: 1rem; font-weight: 600;">/мес</span>
+                        </div>
+                        <ul class="features-list" style="list-style: none; padding: 0; margin: 0 0 2rem 0; text-align: left;">
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2);"><i class="fas fa-check" style="color: #4ade80; margin-right: 0.5rem;"></i> WindexAI Pro модель</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2);"><i class="fas fa-check" style="color: #4ade80; margin-right: 0.5rem;"></i> 1000 запросов/день</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2);"><i class="fas fa-check" style="color: #4ade80; margin-right: 0.5rem;"></i> Голосовые сообщения</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2);"><i class="fas fa-check" style="color: #4ade80; margin-right: 0.5rem;"></i> Обработка документов</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2);"><i class="fas fa-check" style="color: #4ade80; margin-right: 0.5rem;"></i> AI генератор сайтов</li>
+                            <li style="padding: 0.5rem 0;"><i class="fas fa-check" style="color: #4ade80; margin-right: 0.5rem;"></i> Приоритетная поддержка</li>
+                        </ul>
+                        <button class="btn btn-light plan-btn" onclick="selectPlan('plus')" style="width: 100%; padding: 0.75rem; border-radius: 8px; background: white; color: #667eea; border: none;">
+                            Выбрать Plus
+                        </button>
+                    </div>
+
+                    <!-- Pro Plan -->
+                    <div class="pricing-card pro-card" style="background: white; border: 2px solid #20993b; border-radius: 16px; padding: 2rem; text-align: center; box-shadow: 0 4px 12px rgba(32, 153, 59, 0.1);">
+                        <div class="plan-badge" style="background: #20993b; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-bottom: 1rem;">Премиум</div>
+                        <h3 class="plan-name" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Pro</h3>
+                        <div class="plan-price" style="font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem;">
+                            <span class="currency">₽</span>
+                            <span class="amount">2,990</span>
+                            <span class="period" style="font-size: 1rem; font-weight: 600;">/мес</span>
+                        </div>
+                        <ul class="features-list" style="list-style: none; padding: 0; margin: 0 0 2rem 0; text-align: left;">
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> Все возможности Plus</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> Безлимитные запросы</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> Продвинутый AI редактор</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> Экспорт в любые форматы</li>
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> API доступ</li>
+                            <li style="padding: 0.5rem 0;"><i class="fas fa-check" style="color: #20993b; margin-right: 0.5rem;"></i> Персональный менеджер</li>
+                        </ul>
+                        <button class="btn btn-primary plan-btn" onclick="selectPlan('pro')" style="width: 100%; padding: 0.75rem; border-radius: 8px;">
+                            Выбрать Pro
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-end mt-4">
+                    <button class="btn btn-outline close-pricing">Закрыть</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="/static/script.js?v=20251027-14"></script>

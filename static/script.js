@@ -12,7 +12,8 @@ class AuthManager {
         if (this.token) {
             this.verifyToken();
         } else {
-            this.showAuthModal();
+            // Для гостей показываем кнопки входа/регистрации
+            this.showGuestUI();
         }
     }
 
@@ -88,17 +89,75 @@ class AuthManager {
         this.token = null;
         this.user = null;
         localStorage.removeItem('windexai_token');
-        this.showAuthModal();
+        // После выхода показываем кнопки для гостей вместо модального окна
+        document.getElementById('main-app').classList.add('hidden');
+        this.showGuestUI();
     }
 
     showAuthModal() {
         document.getElementById('auth-modal').style.display = 'flex';
         document.getElementById('main-app').classList.add('hidden');
+
+        // Скрываем личный кабинет и показываем кнопки входа
+        this.showGuestUI();
+    }
+
+    showGuestUI() {
+        const userProfile = document.getElementById('user-profile');
+        const authButtons = document.getElementById('auth-buttons');
+
+        if (userProfile) {
+            userProfile.classList.add('hidden');
+        }
+
+        if (authButtons) {
+            authButtons.classList.remove('hidden');
+        }
     }
 
     showMainApp() {
         document.getElementById('auth-modal').style.display = 'none';
         document.getElementById('main-app').classList.remove('hidden');
+
+        // Показываем личный кабинет и скрываем кнопки входа
+        this.showUserUI();
+
+        // Заполняем информацию о пользователе
+        this.updateUserProfile();
+    }
+
+    showUserUI() {
+        const userProfile = document.getElementById('user-profile');
+        const authButtons = document.getElementById('auth-buttons');
+
+        if (userProfile) {
+            userProfile.classList.remove('hidden');
+        }
+
+        if (authButtons) {
+            authButtons.classList.add('hidden');
+        }
+    }
+
+    updateUserProfile() {
+        if (this.user) {
+            const displayName = this.user.username || 'Пользователь';
+            const email = this.user.email || '';
+            const firstLetter = displayName.charAt(0).toUpperCase();
+
+            // Обновляем элементы интерфейса с проверкой существования
+            const userDisplayName = document.getElementById('user-display-name');
+            const userFullName = document.getElementById('user-full-name');
+            const userEmail = document.getElementById('user-email');
+            const userAvatarLetter = document.getElementById('user-avatar-letter');
+            const userAvatarLetterLarge = document.getElementById('user-avatar-letter-large');
+
+            if (userDisplayName) userDisplayName.textContent = displayName;
+            if (userFullName) userFullName.textContent = displayName;
+            if (userEmail) userEmail.textContent = email;
+            if (userAvatarLetter) userAvatarLetter.textContent = firstLetter;
+            if (userAvatarLetterLarge) userAvatarLetterLarge.textContent = firstLetter;
+        }
     }
 
     getAuthHeaders() {
@@ -123,8 +182,10 @@ class WindexAI {
 
     initializeElements() {
         this.messageInput = document.getElementById('message-input');
-        this.sendBtn = document.getElementById('send-btn');
-        this.voiceBtn = document.getElementById('voice-btn');
+        this.actionBtn = document.getElementById('action-btn');
+
+        // Initialize action button state
+        this.toggleActionButton();
         this.connectBtn = document.getElementById('connect-btn');
         this.documentBtn = document.getElementById('document-btn');
         this.documentInput = document.getElementById('document-input');
@@ -142,7 +203,6 @@ class WindexAI {
         this.conversationsList = document.getElementById('conversations-list');
         this.clearHistoryBtn = document.getElementById('clear-history-btn');
         this.loadingOverlay = document.getElementById('loading-overlay');
-        this.charCount = document.querySelector('.char-count');
         this.modelCards = document.querySelectorAll('.model-card');
 
         // Connect modal elements
@@ -168,8 +228,7 @@ class WindexAI {
     bindEvents() {
         // Message input
         this.messageInput.addEventListener('input', () => {
-            this.updateCharCount();
-            this.toggleSendButton();
+            this.toggleActionButton();
             this.autoResize();
         });
 
@@ -179,6 +238,19 @@ class WindexAI {
                 this.sendMessage();
             }
         });
+
+        // Action button click handler
+        if (this.actionBtn) {
+            this.actionBtn.addEventListener('click', () => {
+                const hasText = this.messageInput.value.trim().length > 0;
+                if (hasText) {
+                    this.sendMessage();
+                } else {
+                    // TODO: Implement voice recording
+                    console.log('Voice recording not implemented yet');
+                }
+            });
+        }
 
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
@@ -195,17 +267,6 @@ class WindexAI {
             });
         }
 
-        // Send button
-        this.sendBtn.addEventListener('click', () => {
-            this.sendMessage();
-        });
-
-        // Voice button
-        if (this.voiceBtn) {
-            this.voiceBtn.addEventListener('click', () => {
-                this.toggleVoiceRecording();
-            });
-        }
 
         // Connect button
         if (this.connectBtn) {
@@ -248,15 +309,6 @@ class WindexAI {
             });
         });
 
-        // Specialist cards
-        const specialistCards = document.querySelectorAll('.specialist-card');
-        specialistCards.forEach((card) => {
-            card.addEventListener('click', (e) => {
-                const specialist = card.dataset.specialist;
-                const model = card.dataset.model;
-                this.selectSpecialist(specialist, model);
-            });
-        });
 
 
         // Clear history button
@@ -284,6 +336,51 @@ class WindexAI {
             });
         }
 
+        // Personalization modal handlers
+        const closePersonalizationBtn = document.querySelector('.close-personalization');
+        if (closePersonalizationBtn) {
+            closePersonalizationBtn.addEventListener('click', () => {
+                this.hidePersonalizationModal();
+            });
+        }
+
+        // Close personalization modal on outside click
+        const personalizationModal = document.getElementById('personalization-modal');
+        if (personalizationModal) {
+            personalizationModal.addEventListener('click', (e) => {
+                if (e.target === personalizationModal) {
+                    this.hidePersonalizationModal();
+                }
+            });
+        }
+
+        // Style selection in personalization modal
+        const styleOptions = document.querySelectorAll('#personalization-modal .style-option');
+        styleOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                styleOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Pricing modal handlers
+        const closePricingBtn = document.querySelector('.close-pricing');
+        if (closePricingBtn) {
+            closePricingBtn.addEventListener('click', () => {
+                this.hidePricingModal();
+            });
+        }
+
+        // Close pricing modal on outside click
+        const pricingModal = document.getElementById('pricing-modal');
+        if (pricingModal) {
+            pricingModal.addEventListener('click', (e) => {
+                if (e.target === pricingModal) {
+                    this.hidePricingModal();
+                }
+            });
+        }
+
     }
 
     async selectModel(model) {
@@ -308,29 +405,9 @@ class WindexAI {
         this.showSelectedModel();
         this.hideWelcomeMessage();
 
-        showNotification(`Выбрана модель: ${modelInfo.name}`, 'success');
         this.messageInput.focus();
     }
 
-    selectSpecialist(specialist, model) {
-        this.currentModel = model;
-        this.currentSpecialist = specialist;
-
-        // Update model info with specialist details
-        const specialistInfo = this.getSpecialistInfo(specialist);
-        const modelInfo = this.getModelInfo(model);
-
-        this.modelIcon.textContent = specialistInfo.icon;
-        this.modelName.textContent = specialistInfo.name;
-        this.modelDescription.textContent = specialistInfo.description;
-
-        // Show selected model and hide welcome message
-        this.showSelectedModel();
-        this.hideWelcomeMessage();
-
-        showNotification(`Выбран специалист: ${specialistInfo.name}`, 'success');
-        this.messageInput.focus();
-    }
 
     getModelInfo(model) {
         const models = {
@@ -348,41 +425,6 @@ class WindexAI {
         return models[model] || models['gpt-4o-mini'];
     }
 
-    getSpecialistInfo(specialist) {
-        const specialists = {
-            'mentor': {
-                icon: '🎓',
-                name: 'AI Ментор',
-                description: 'Персональный наставник для развития навыков и карьеры'
-            },
-            'psychologist': {
-                icon: '🧠',
-                name: 'AI Психолог',
-                description: 'Поддержка психического здоровья и эмоционального благополучия'
-            },
-            'programmer': {
-                icon: '💻',
-                name: 'AI Программист',
-                description: 'Эксперт по разработке и техническим решениям'
-            },
-            'accountant': {
-                icon: '📊',
-                name: 'AI Бухгалтер',
-                description: 'Финансовый консультант и эксперт по учету'
-            },
-            'analyst': {
-                icon: '📈',
-                name: 'AI Аналитик',
-                description: 'Специалист по анализу данных и бизнес-процессов'
-            },
-            'general': {
-                icon: '',
-                name: 'Универсальный AI',
-                description: 'Многофункциональный помощник для любых задач'
-            }
-        };
-        return specialists[specialist] || specialists['general'];
-    }
 
     showSelectedModel() {
         this.selectedModel.classList.remove('hidden');
@@ -406,8 +448,7 @@ class WindexAI {
         // Add user message to chat
         this.addMessageToChat('user', message);
         this.messageInput.value = '';
-        this.updateCharCount();
-        this.toggleSendButton();
+        this.toggleActionButton();
 
         // Show typing indicator
         this.showTypingIndicator();
@@ -424,8 +465,7 @@ class WindexAI {
                 body: JSON.stringify({
                     message: message,
                     model: this.currentModel,
-                    conversation_id: this.currentConversationId,
-                    specialist: this.currentSpecialist || null
+                    conversation_id: this.currentConversationId
                 })
             });
 
@@ -581,14 +621,366 @@ class WindexAI {
 
         // Обрабатываем правильные блоки кода ```language\ncode```
         text = text.replace(/```(\w+)?\n?([\s\S]*?)```/g, (match, language, code) => {
-            const lang = language || 'text';
             const cleanCode = code.trim();
+            // Нормализуем название языка
+            let normalizedLang = language ? language.toLowerCase() : 'text';
+
+            // Расширенное распознавание языков
+            const languageMap = {
+                'py': 'python',
+                'js': 'javascript',
+                'ts': 'typescript',
+                'cpp': 'cpp',
+                'c++': 'cpp',
+                'cs': 'csharp',
+                'c#': 'csharp',
+                'sh': 'bash',
+                'shell': 'bash',
+                'yml': 'yaml',
+                'dockerfile': 'dockerfile',
+                'golang': 'go',
+                'objective-c': 'objective-c',
+                'objectivec': 'objective-c',
+                'vb': 'visual-basic',
+                'vb.net': 'visual-basic',
+                'f#': 'fsharp',
+                'fs': 'fsharp',
+                'pl': 'perl',
+                'tcl': 'tcl',
+                'lua': 'lua',
+                'rscript': 'r',
+                'r-lang': 'r',
+                'matlab-lang': 'matlab',
+                'fortran': 'fortran',
+                'cobol': 'cobol',
+                'pascal': 'pascal',
+                'delphi': 'delphi',
+                'ada': 'ada',
+                'scheme': 'scheme',
+                'common-lisp': 'common-lisp',
+                'clojure': 'clojure',
+                'haskell': 'haskell',
+                'erlang': 'erlang',
+                'elixir': 'elixir',
+                'scala': 'scala',
+                'groovy': 'groovy',
+                'coffeescript': 'coffeescript',
+                'dart': 'dart',
+                'kotlin': 'kotlin',
+                'swift': 'swift',
+                'crystal': 'crystal',
+                'nim': 'nim',
+                'd': 'd',
+                'nimrod': 'nim',
+                'pony': 'pony',
+                'v': 'v',
+                'zig': 'zig',
+                'gleam': 'gleam',
+                'ballerina': 'ballerina',
+                'terraform': 'terraform',
+                'hcl': 'hcl',
+                'pulumi': 'pulumi',
+                'yaml': 'yaml',
+                'json5': 'json',
+                'jsonc': 'json',
+                'xml': 'xml',
+                'svg': 'xml',
+                'html5': 'html',
+                'xhtml': 'html',
+                'jade': 'pug',
+                'stylus': 'stylus',
+                'sass': 'scss',
+                'scss': 'scss',
+                'less': 'less',
+                'postcss': 'css',
+                'vue': 'vue',
+                'svelte': 'svelte',
+                'astro': 'astro',
+                'jsx': 'javascript',
+                'tsx': 'typescript',
+                'mjs': 'javascript',
+                'cjs': 'javascript',
+                'mts': 'typescript',
+                'cts': 'typescript',
+                'vue-js': 'vue',
+                'nuxt': 'vue',
+                'nuxtjs': 'vue',
+                'next': 'javascript',
+                'nextjs': 'javascript',
+                'react': 'javascript',
+                'angular': 'typescript',
+                'angularjs': 'javascript',
+                'ember': 'javascript',
+                'backbone': 'javascript',
+                'jquery': 'javascript',
+                'lodash': 'javascript',
+                'underscore': 'javascript',
+                'moment': 'javascript',
+                'axios': 'javascript',
+                'express': 'javascript',
+                'nestjs': 'typescript',
+                'fastify': 'javascript',
+                'hapi': 'javascript',
+                'koa': 'javascript',
+                'meteor': 'javascript',
+                'sails': 'javascript',
+                'loopback': 'javascript',
+                'feathers': 'javascript',
+                'strapi': 'javascript',
+                'keystone': 'javascript',
+                'ghost': 'javascript',
+                'payload': 'typescript',
+                'directus': 'javascript',
+                'hasura': 'graphql',
+                'prisma': 'typescript',
+                'mongoose': 'javascript',
+                'sequelize': 'javascript',
+                'typeorm': 'typescript',
+                'django': 'python',
+                'flask': 'python',
+                'fastapi': 'python',
+                'tornado': 'python',
+                'bottle': 'python',
+                'cherrypy': 'python',
+                'web2py': 'python',
+                'turbogears': 'python',
+                'pylons': 'python',
+                'zope': 'python',
+                'plone': 'python',
+                'django-rest': 'python',
+                'django-cms': 'python',
+                'wagtail': 'python',
+                'mezzanine': 'python',
+                'feincms': 'python',
+                'django-oscar': 'python',
+                'saleor': 'python',
+                'shoop': 'python',
+                'lfs': 'python',
+                'cartridge': 'python',
+                'broadleaf': 'python',
+                'magento': 'php',
+                'wordpress': 'php',
+                'drupal': 'php',
+                'joomla': 'php',
+                'laravel': 'php',
+                'symfony': 'php',
+                'codeigniter': 'php',
+                'cakephp': 'php',
+                'zend': 'php',
+                'slim': 'php',
+                'phalcon': 'php',
+                'fuelphp': 'php',
+                'silex': 'php',
+                'lumen': 'php',
+                'rails': 'ruby',
+                'sinatra': 'ruby',
+                'hanami': 'ruby',
+                'roda': 'ruby',
+                'camping': 'ruby',
+                'ramaze': 'ruby',
+                'merb': 'ruby',
+                'padrino': 'ruby',
+                'grape': 'ruby',
+                'cuba': 'ruby',
+                'lotus': 'ruby',
+                'trailblazer': 'ruby',
+                'spring': 'java',
+                'spring-boot': 'java',
+                'spring-mvc': 'java',
+                'hibernate': 'java',
+                'struts': 'java',
+                'jsf': 'java',
+                'primefaces': 'java',
+                'vaadin': 'java',
+                'play': 'scala',
+                'akka': 'scala',
+                'finagle': 'scala',
+                'scalatra': 'scala',
+                'lift': 'scala',
+                'unfiltered': 'scala',
+                'spray': 'scala',
+                'sbt': 'scala',
+                'gradle': 'groovy',
+                'maven': 'xml',
+                'ant': 'xml',
+                'ivy': 'xml',
+                'makefile': 'makefile',
+                'cmake': 'cmake',
+                'meson': 'python',
+                'bazel': 'python',
+                'pants': 'python',
+                'buck': 'python',
+                'please': 'python',
+                'docker': 'dockerfile',
+                'docker-compose': 'yaml',
+                'kubernetes': 'yaml',
+                'helm': 'yaml',
+                'kustomize': 'yaml',
+                'istio': 'yaml',
+                'prometheus': 'yaml',
+                'grafana': 'json',
+                'influxdb': 'influxql',
+                'timescaledb': 'sql',
+                'cockroachdb': 'sql',
+                'yugabytedb': 'sql',
+                'cassandra': 'cql',
+                'scylla': 'cql',
+                'mongodb': 'javascript',
+                'redis': 'redis',
+                'memcached': 'memcached',
+                'elasticsearch': 'json',
+                'solr': 'xml',
+                'neo4j': 'cypher',
+                'arangodb': 'javascript',
+                'couchdb': 'javascript',
+                'pouchdb': 'javascript',
+                'leveldb': 'javascript',
+                'rocksdb': 'cpp',
+                'foundationdb': 'cpp',
+                'etcd': 'go',
+                'consul': 'go',
+                'vault': 'go',
+                'nomad': 'go',
+                'terraform': 'hcl',
+                'packer': 'hcl',
+                'vagrant': 'ruby',
+                'ansible': 'yaml',
+                'puppet': 'puppet',
+                'chef': 'ruby',
+                'saltstack': 'python',
+                'salt': 'python',
+                'nginx': 'nginx',
+                'apache': 'apache',
+                'haproxy': 'haproxy',
+                'traefik': 'toml',
+                'caddy': 'caddyfile',
+                'envoy': 'yaml',
+                'kong': 'lua',
+                'tyk': 'json',
+                'gravitee': 'json',
+                'krakend': 'json',
+                'gloo': 'yaml',
+                'contour': 'yaml',
+                'ambassador': 'yaml',
+                'gitea': 'go',
+                'gogs': 'go',
+                'gitlab': 'ruby',
+                'github': 'typescript',
+                'bitbucket': 'python',
+                'jira': 'java',
+                'confluence': 'java',
+                'slack': 'typescript',
+                'discord': 'typescript',
+                'telegram': 'python',
+                'whatsapp': 'javascript',
+                'signal': 'rust',
+                'matrix': 'python',
+                'xmpp': 'python',
+                'irc': 'perl',
+                'mattermost': 'go',
+                'zulip': 'python',
+                'rocket.chat': 'javascript',
+                'twilio': 'javascript',
+                'sendgrid': 'go',
+                'mailgun': 'python',
+                'postmark': 'csharp',
+                'mailchimp': 'php',
+                'convertkit': 'ruby',
+                'stripe': 'ruby',
+                'paypal': 'php',
+                'braintree': 'ruby',
+                'adyen': 'java',
+                'checkout': 'csharp',
+                'aws': 'python',
+                'gcp': 'python',
+                'azure': 'csharp',
+                'heroku': 'ruby',
+                'digitalocean': 'go',
+                'linode': 'go',
+                'vultr': 'go',
+                'aws-lambda': 'javascript',
+                'gcp-functions': 'javascript',
+                'azure-functions': 'csharp',
+                'vercel': 'javascript',
+                'netlify': 'javascript',
+                'cloudflare': 'rust',
+                'fastly': 'rust',
+                'akamai': 'java',
+                'cloudfront': 'javascript',
+                'opencv': 'cpp',
+                'tensorflow': 'python',
+                'pytorch': 'python',
+                'keras': 'python',
+                'scikit-learn': 'python',
+                'pandas': 'python',
+                'numpy': 'python',
+                'matplotlib': 'python',
+                'seaborn': 'python',
+                'plotly': 'javascript',
+                'd3': 'javascript',
+                'chartjs': 'javascript',
+                'highcharts': 'javascript',
+                'echarts': 'javascript',
+                'three.js': 'javascript',
+                'babylon.js': 'typescript',
+                'aframe': 'javascript',
+                'webgl': 'javascript',
+                'canvas': 'javascript',
+                'svg': 'xml',
+                'electron': 'javascript',
+                'nw.js': 'javascript',
+                'tauri': 'rust',
+                'flutter': 'dart',
+                'react-native': 'javascript',
+                'ionic': 'typescript',
+                'cordova': 'javascript',
+                'capacitor': 'typescript',
+                'expo': 'javascript',
+                'xamarin': 'csharp',
+                'unity': 'csharp',
+                'unreal': 'cpp',
+                'godot': 'gdscript',
+                'gamemaker': 'gml',
+                'phaser': 'javascript',
+                'pixi.js': 'javascript',
+                'fabric.js': 'javascript',
+                'paper.js': 'javascript',
+                'konva.js': 'javascript',
+                'p5.js': 'javascript',
+                'processing': 'processing',
+                'arduino': 'cpp',
+                'raspberry-pi': 'python',
+                'esp32': 'cpp',
+                'esp8266': 'cpp',
+                'stm32': 'cpp',
+                'avr': 'cpp',
+                'arm': 'assembly',
+                'riscv': 'assembly',
+                'x86': 'assembly',
+                'x64': 'assembly',
+                'cuda': 'cuda',
+                'opencl': 'cpp',
+                'metal': 'objective-c',
+                'vulkan': 'cpp',
+                'directx': 'cpp',
+                'opengl': 'cpp',
+                'webgpu': 'typescript',
+                'wasm': 'webassembly',
+                'emscripten': 'cpp',
+                'asm.js': 'javascript'
+            };
+
+            normalizedLang = languageMap[normalizedLang] || normalizedLang;
+
+            // Получаем читаемое название языка
+            const displayName = normalizedLang.charAt(0).toUpperCase() + normalizedLang.slice(1);
+
             return `<div class="code-block">
                 <div class="code-header">
-                    <span class="code-language">${lang}</span>
+                    <span class="code-language">${displayName}</span>
                     <button class="code-copy-button" onclick="copyCodeToClipboard(this)">📋 Копировать</button>
                 </div>
-                <pre data-language="${lang}"><code>${cleanCode}</code></pre>
+                <pre data-language="${normalizedLang}"><code>${cleanCode}</code></pre>
             </div>`;
         });
 
@@ -929,9 +1321,7 @@ class WindexAI {
 
         if (conversations.length === 0) {
             const emptyState = document.createElement('div');
-            emptyState.className = 'text-center';
-            emptyState.style.color = 'var(--gray-500)';
-            emptyState.style.padding = 'var(--spacing-4)';
+            emptyState.className = 'empty-state-glass';
             emptyState.textContent = 'Нет сохраненных чатов';
             this.conversationsList.appendChild(emptyState);
             return;
@@ -1136,20 +1526,35 @@ class WindexAI {
     }
 
 
-    updateCharCount() {
-        const count = this.messageInput.value.length;
-        this.charCount.textContent = `${count}/4000`;
 
-        if (count > 3500) {
-            this.charCount.style.color = 'var(--primary-green)';
-        } else {
-            this.charCount.style.color = 'var(--gray-500)';
-        }
-    }
-
-    toggleSendButton() {
+    toggleActionButton() {
         const hasText = this.messageInput.value.trim().length > 0;
-        this.sendBtn.disabled = !hasText || this.isLoading;
+
+        if (hasText) {
+            // Режим отправки сообщения
+            this.actionBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                </svg>
+            `;
+            this.actionBtn.className = 'btn btn-primary btn-sm';
+            this.actionBtn.title = 'Отправить сообщение';
+            this.actionBtn.disabled = this.isLoading;
+        } else {
+            // Режим голосового ввода
+            this.actionBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+            `;
+            this.actionBtn.className = 'btn btn-outline';
+            this.actionBtn.title = 'Голосовое сообщение';
+            this.actionBtn.disabled = false;
+        }
     }
 
     autoResize() {
@@ -1166,9 +1571,9 @@ class WindexAI {
     showLoading() {
         // Create and show typing indicator at the end of messages
         this.createTypingIndicator();
-        this.sendBtn.disabled = true;
-        this.sendBtn.innerHTML = `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="loading-spinner">
+        this.actionBtn.disabled = true;
+        this.actionBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="loading-spinner">
                 <circle cx="12" cy="12" r="10" stroke-dasharray="31.416" stroke-dashoffset="31.416">
                     <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
                     <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
@@ -1178,15 +1583,9 @@ class WindexAI {
     }
 
     hideLoading() {
-        // Remove typing indicator and restore send button
+        // Remove typing indicator and restore action button to current state
         this.removeTypingIndicator();
-        this.sendBtn.disabled = false;
-        this.sendBtn.innerHTML = `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
-            </svg>
-        `;
+        this.toggleActionButton(); // This will restore the button to correct state based on input
     }
 
     createTypingIndicator() {
@@ -1271,7 +1670,7 @@ class WindexAI {
             this.isRecording = true;
             this.recordingStartTime = Date.now();
 
-            this.updateVoiceButton();
+            // this.updateVoiceButton(); // Voice recording not implemented yet
             this.startRecordingTimer();
 
         } catch (error) {
@@ -1285,7 +1684,7 @@ class WindexAI {
             this.mediaRecorder.stop();
             this.isRecording = false;
 
-            this.updateVoiceButton();
+            // this.updateVoiceButton(); // Voice recording not implemented yet
             this.stopRecordingTimer();
 
             // Stop all tracks
@@ -1294,28 +1693,8 @@ class WindexAI {
     }
 
 
-    updateVoiceButton() {
-        if (this.voiceBtn) {
-            if (this.isRecording) {
-                this.voiceBtn.classList.add('recording');
-                this.voiceBtn.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="6" y="6" width="12" height="12" rx="2"></rect>
-                    </svg>
-                `;
-            } else {
-                this.voiceBtn.classList.remove('recording');
-                this.voiceBtn.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                        <line x1="12" y1="19" x2="12" y2="23"></line>
-                        <line x1="8" y1="23" x2="16" y2="23"></line>
-                    </svg>
-                `;
-            }
-        }
-    }
+    // updateVoiceButton() - Voice recording not implemented yet
+    // TODO: Implement voice recording functionality
 
     startRecordingTimer() {
         this.recordingTimer = setInterval(() => {
@@ -1886,6 +2265,34 @@ class WindexAI {
         }
     }
 
+    showPersonalizationModal() {
+        const modal = document.getElementById('personalization-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    hidePersonalizationModal() {
+        const modal = document.getElementById('personalization-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    showPricingModal() {
+        const modal = document.getElementById('pricing-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    hidePricingModal() {
+        const modal = document.getElementById('pricing-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
     toggleToolsDropdown() {
         if (this.toolsDropdown) {
             this.toolsDropdown.classList.toggle('show');
@@ -2092,9 +2499,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const authManager = new AuthManager();
 
     // Initialize WindexAI only after authentication
+    const originalShowMainApp = authManager.showMainApp;
     authManager.showMainApp = function() {
-        document.getElementById('auth-modal').style.display = 'none';
-        document.getElementById('main-app').classList.remove('hidden');
+        // Вызываем оригинальный метод для показа основного приложения
+        originalShowMainApp.call(authManager);
         // Initialize WindexAI after showing main app
         if (!window.windexAI) {
             window.windexAI = new WindexAI(authManager);
@@ -2274,6 +2682,88 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 300);
         });
     }
+
+    // Обработчики для личного кабинета пользователя
+    const userMenuTrigger = document.getElementById('user-menu-trigger');
+    const userDropdown = document.getElementById('user-dropdown');
+    const logoutBtn = document.getElementById('logout-btn');
+    const profileLink = document.getElementById('profile-link');
+
+    // Обработчики для кнопок входа/регистрации (для неавторизованных пользователей)
+    const loginBtn = document.getElementById('login-btn');
+    const registerBtn = document.getElementById('register-btn');
+
+    // Обработчик открытия/закрытия выпадающего меню пользователя
+    if (userMenuTrigger && userDropdown) {
+        userMenuTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+        });
+
+        // Закрытие меню при клике вне его
+        document.addEventListener('click', (e) => {
+            if (!userMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+            }
+        });
+    }
+
+    // Обработчик выхода из системы
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            authManager.logout();
+            userDropdown.classList.remove('active');
+        });
+    }
+
+    // Обработчик ссылки на профиль (пока просто закрываем меню)
+    if (profileLink) {
+        profileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            // TODO: Добавить страницу профиля
+            userDropdown.classList.remove('active');
+        });
+    }
+
+    // Обработчик ссылки на pricing
+    const pricingLink = document.getElementById('pricing-link');
+    if (pricingLink) {
+        pricingLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showPricingModal();
+            userDropdown.classList.remove('active');
+        });
+    }
+
+    // Обработчик ссылки на персонализацию
+    const personalizationLink = document.getElementById('personalization-link');
+    if (personalizationLink) {
+        personalizationLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showPersonalizationModal();
+            userDropdown.classList.remove('active');
+        });
+    }
+
+    // Обработчики для кнопок входа/регистрации
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            authManager.showAuthModal();
+        });
+    }
+
+    if (registerBtn) {
+        registerBtn.addEventListener('click', () => {
+            authManager.showAuthModal();
+            // Переключаемся на форму регистрации
+            setTimeout(() => {
+                const showRegisterLink = document.getElementById('show-register');
+                if (showRegisterLink) {
+                    showRegisterLink.click();
+                }
+            }, 100);
+        });
+    }
 });
 
 // Add some utility functions
@@ -2338,25 +2828,6 @@ function copyCodeToClipboard(button) {
 }
 
 // Функция для прокрутки карточек специалистов
-function scrollSpecialists(direction) {
-    const grid = document.getElementById('specialistsGrid');
-    if (!grid) return;
-
-    const scrollAmount = 300; // Количество пикселей для прокрутки
-    const currentScroll = grid.scrollLeft;
-
-    if (direction === 'left') {
-        grid.scrollTo({
-            left: currentScroll - scrollAmount,
-            behavior: 'smooth'
-        });
-    } else if (direction === 'right') {
-        grid.scrollTo({
-            left: currentScroll + scrollAmount,
-            behavior: 'smooth'
-        });
-    }
-}
 
 // Обновление видимости кнопок прокрутки
 function updateScrollButtons() {
@@ -2527,12 +2998,51 @@ function handleConnect() {
     }
 }
 
+function savePersonalization() {
+    const selectedStyle = document.querySelector('#personalization-modal .style-option.selected');
+    const customInstructions = document.querySelector('#personalization-modal .custom-instructions textarea');
+    const alias = document.querySelector('#personalization-modal input[placeholder*="псевдоним"]');
+    const profession = document.querySelector('#personalization-modal input[placeholder*="профессия"]');
+    const about = document.querySelector('#personalization-modal textarea[placeholder*="интересах"]');
+
+    const personalizationData = {
+        style: selectedStyle ? selectedStyle.dataset.style : 'default',
+        customInstructions: customInstructions ? customInstructions.value : '',
+        alias: alias ? alias.value : '',
+        profession: profession ? profession.value : '',
+        about: about ? about.value : ''
+    };
+
+    // Сохраняем в localStorage (пока локально)
+    localStorage.setItem('windexai_personalization', JSON.stringify(personalizationData));
+
+    // Показываем уведомление
+    showNotification('Настройки персонализации сохранены!', 'success');
+
+    // Закрываем модальное окно
+    const chatApp = window.chatApp;
+    if (chatApp) {
+        chatApp.hidePersonalizationModal();
+    }
+}
+
 function openCloudManager() {
     if (cloudManager) {
         cloudManager.show();
     } else {
         showNotification('Сначала подключитесь к облаку', 'error');
     }
+}
+
+function selectPlan(plan) {
+    // Здесь будет логика выбора плана
+    console.log(`Выбран план: ${plan}`);
+
+    // Показываем уведомление
+    showNotification(`План ${plan} выбран!`, 'success');
+
+    // Можно добавить логику для перехода к оплате или активации плана
+    // closePricingModal();
 }
 
 // Force cache refresh 1760126317

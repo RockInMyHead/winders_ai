@@ -12,13 +12,16 @@ from database import create_tables
 # Import routers
 from routes import (admin, auth, chat, conversations,
                     deploy, documents, voice)
-from routes.ai_editor import router as ai_editor_router
+# from routes.ai_editor import router as ai_editor_router  # Temporarily disabled
 from routes.cloud_mock import router as cloud_mock_router
 
 # Create tables on startup
 create_tables()
 
-app = FastAPI(title="WindexsAi", description="Chat Platform with Model Selection")
+app = FastAPI(
+    title="WindexsAi",
+    description="Chat Platform with Model Selection"
+)
 
 # CORS middleware
 app.add_middleware(
@@ -37,7 +40,7 @@ app.include_router(auth.router)
 app.include_router(chat.router)
 app.include_router(conversations.router)
 app.include_router(admin.router)
-app.include_router(ai_editor_router)
+# app.include_router(ai_editor_router)  # Temporarily disabled
 app.include_router(deploy.router)
 app.include_router(voice.router)
 app.include_router(documents.router)
@@ -78,10 +81,8 @@ async def read_root():
     return FileResponse("static/index.html")
 
 
-@app.get("/pricing", response_class=HTMLResponse)
-async def read_pricing():
-    """Serve the pricing HTML page"""
-    return FileResponse("static/pricing.html")
+
+
 
 
 @app.get("/editor", response_class=HTMLResponse)
@@ -173,7 +174,7 @@ if __name__ == "__main__":
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=9000,
+        port=8000,
         timeout_keep_alive=300,  # 5 минут для долгих запросов
         timeout_graceful_shutdown=30
     )

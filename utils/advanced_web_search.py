@@ -5,8 +5,8 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote, urljoin, urlparse
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.metrics.pairwise import cosine_similarity
 import hashlib
 import os
 import time
@@ -206,48 +206,10 @@ class AdvancedWebSearch:
         return content
     
     def rank_contexts(self, query: str, docs: List[str]) -> List[str]:
-        """Ранжирование документов по релевантности с помощью TF-IDF"""
-        try:
-            if not docs or not any(doc.strip() for doc in docs):
-                return docs
-            
-            # Подготавливаем документы
-            clean_docs = [doc.strip() for doc in docs if doc.strip()]
-            if not clean_docs:
-                return docs
-            
-            # Создаем векторizer с русскими стоп-словами
-            stop_words = [
-                'и', 'в', 'во', 'не', 'что', 'он', 'на', 'я', 'с', 'со', 'как', 'а', 'то', 'все', 'она', 'так', 'его', 'но', 'да', 'ты', 'к', 'у', 'же', 'вы', 'за', 'бы', 'по', 'только', 'ее', 'мне', 'было', 'вот', 'от', 'меня', 'еще', 'нет', 'о', 'из', 'ему', 'теперь', 'когда', 'даже', 'ну', 'вдруг', 'ли', 'если', 'уже', 'или', 'ни', 'быть', 'был', 'него', 'до', 'вас', 'нибудь', 'опять', 'уж', 'вам', 'ведь', 'там', 'потом', 'себя', 'ничего', 'ей', 'может', 'они', 'тут', 'где', 'есть', 'надо', 'ней', 'для', 'мы', 'тебя', 'их', 'чем', 'была', 'сам', 'чтоб', 'без', 'будто', 'чего', 'раз', 'тоже', 'себе', 'под', 'будет', 'ж', 'тогда', 'кто', 'этот', 'того', 'потому', 'этого', 'какой', 'совсем', 'ним', 'здесь', 'этом', 'один', 'почти', 'мой', 'тем', 'чтобы', 'нее', 'сейчас', 'были', 'куда', 'зачем', 'всех', 'никогда', 'можно', 'при', 'наконец', 'два', 'об', 'другой', 'хоть', 'после', 'над', 'больше', 'тот', 'через', 'эти', 'нас', 'про', 'всего', 'них', 'какая', 'много', 'разве', 'три', 'эту', 'моя', 'впрочем', 'хорошо', 'свою', 'этой', 'перед', 'иногда', 'лучше', 'чуть', 'том', 'нельзя', 'такой', 'им', 'более', 'всегда', 'конечно', 'всю', 'между'
-            ]
-            
-            vectorizer = TfidfVectorizer(
-                stop_words=stop_words,
-                max_features=1000,
-                ngram_range=(1, 2)
-            )
-            
-            # Добавляем запрос к документам для векторизации
-            all_texts = [query] + clean_docs
-            
-            try:
-                vectors = vectorizer.fit_transform(all_texts)
-                scores = cosine_similarity(vectors[0:1], vectors[1:]).flatten()
-                
-                # Сортируем по релевантности
-                scored_docs = sorted(zip(scores, clean_docs), key=lambda x: -x[0])
-                ranked_docs = [doc for _, doc in scored_docs]
-                
-                logger.info(f"Ранжирование завершено. Лучший скор: {max(scores) if len(scores) > 0 else 0:.3f}")
-                return ranked_docs
-                
-            except Exception as e:
-                logger.warning(f"Ошибка TF-IDF ранжирования: {e}")
-                return clean_docs
-                
-        except Exception as e:
-            logger.error(f"Ошибка ранжирования контекстов: {e}")
-            return docs
+        """Ранжирование документов по релевантности (sklearn отключен)"""
+        # Временно возвращаем документы без ранжирования
+        logger.info("TF-IDF ранжирование отключено - возвращаем оригинальные документы")
+        return docs
     
     def search_and_analyze(self, query: str, max_results: int = 5) -> Dict[str, Any]:
         """Основная функция поиска и анализа"""

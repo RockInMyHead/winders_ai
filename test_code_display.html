@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест красивого кода</title>
+    <link rel="stylesheet" href="http://72.56.66.107:8000/static/style.css?v=20251027-01">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .message-content {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🎨 Код в стиле ChatGPT</h1>
+
+        <div class="message-content">
+            <p>Теперь код отображается в нейтральных серых тонах, как в ChatGPT:</p>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">Python</span>
+                    <button class="code-copy-button" onclick="copyCodeToClipboard(this)">📋 Копировать</button>
+                </div>
+                <pre data-language="python"><code>def fibonacci(n):
+    """Вычисляет n-ое число Фибоначчи"""
+    if n <= 1:
+        return n
+    
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    
+    return b
+
+# Пример использования
+result = fibonacci(10)
+print(f"10-ое число Фибоначчи: {result}")</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">JavaScript</span>
+                    <button class="code-copy-button" onclick="copyCodeToClipboard(this)">📋 Копировать</button>
+                </div>
+                <pre data-language="javascript"><code>const fetchUserData = async (userId) => {
+    try {
+        const response = await fetch(`/api/users/${userId}`);
+        const userData = await response.json();
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch user data');
+        }
+        
+        return userData;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+    }
+};
+
+// Использование
+fetchUserData(123)
+    .then(data => console.log('User data:', data))
+    .catch(error => console.error('Error:', error));</code></pre>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">Bash</span>
+                    <button class="code-copy-button" onclick="copyCodeToClipboard(this)">📋 Копировать</button>
+                </div>
+                <pre data-language="bash"><code>#!/bin/bash
+
+# Скрипт для резервного копирования
+BACKUP_DIR="/backup"
+SOURCE_DIR="/var/www"
+
+# Создаем директорию если не существует
+mkdir -p "$BACKUP_DIR"
+
+# Создаем архив
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+ARCHIVE_NAME="backup_$TIMESTAMP.tar.gz"
+
+echo "Создание резервной копии..."
+tar -czf "$BACKUP_DIR/$ARCHIVE_NAME" "$SOURCE_DIR"
+
+echo "Резервная копия создана: $BACKUP_DIR/$ARCHIVE_NAME"
+
+# Очистка старых бэкапов (старше 30 дней)
+find "$BACKUP_DIR" -name "backup_*.tar.gz" -mtime +30 -delete
+
+echo "Очистка завершена"</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyCodeToClipboard(button) {
+            const codeBlock = button.closest('.code-block');
+            const codeElement = codeBlock.querySelector('code');
+            const codeText = codeElement.textContent;
+            
+            navigator.clipboard.writeText(codeText).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✅ Скопировано!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                alert('Ошибка при копировании');
+            });
+        }
+    </script>
+</body>
+</html>

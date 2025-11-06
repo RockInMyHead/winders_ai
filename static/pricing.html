@@ -29,10 +29,10 @@
                 <div class="header-content">
                     <a href="/" class="back-btn">
                         <i class="fas fa-arrow-left"></i>
-                        Назад к чату
+                        Назад
                     </a>
                     <h1 class="pricing-title">Тарифы WindexsAI</h1>
-                    <p class="pricing-subtitle">Выберите подходящий план для максимальной продуктивности</p>
+                    <p class="pricing-subtitle">Выберите подходящий план для ваших задач</p>
                 </div>
             </div>
         </header>
@@ -44,23 +44,20 @@
                     <!-- Free Plan -->
                     <div class="pricing-card">
                         <div class="card-header">
-                            <h3 class="plan-name">WindexsAI Lite</h3>
+                            <div class="plan-badge">Бесплатно</div>
+                            <h3 class="plan-name">Lite</h3>
                             <div class="plan-price">
                                 <span class="currency">₽</span>
                                 <span class="amount">0</span>
-                                <span class="period">/месяц</span>
                             </div>
-                            <p class="plan-description">Базовые возможности для повседневных задач</p>
                         </div>
                         <div class="card-body">
                             <ul class="features-list">
-                                <li><i class="fas fa-check"></i> Доступ к WindexAI Lite</li>
-                                <li><i class="fas fa-check"></i> 100 запросов в день</li>
-                                <li><i class="fas fa-check"></i> Базовая поддержка</li>
+                                <li><i class="fas fa-check"></i> WindexAI Lite модель</li>
+                                <li><i class="fas fa-check"></i> 100 запросов/день</li>
                                 <li><i class="fas fa-check"></i> История чатов</li>
-                                <li><i class="fas fa-check"></i> Экспорт данных</li>
-                                <li><i class="fas fa-check"></i> AI-генератор веб-сайтов</li>
-                                <li><i class="fas fa-check"></i> Деплой на домене Windexs</li>
+                                <li><i class="fas fa-check"></i> Генератор сайтов</li>
+                                <li><i class="fas fa-check"></i> Деплой на поддомене</li>
                             </ul>
                             <button class="btn btn-outline plan-btn" onclick="selectPlan('free')">
                                 Текущий план
@@ -68,65 +65,55 @@
                         </div>
                     </div>
 
-                    <!-- Pro Plan -->
-                    <div class="pricing-card pro-card featured">
+                    <!-- Plus Plan -->
+                    <div class="pricing-card plus-card">
                         <div class="card-header">
-                            <h3 class="plan-name">WindexsAI Pro</h3>
+                            <div class="plan-badge">Стандарт</div>
+                            <h3 class="plan-name">Plus</h3>
                             <div class="plan-price">
                                 <span class="currency">₽</span>
-                                <span class="amount">2,990</span>
-                                <span class="period">/месяц</span>
+                                <span class="amount">990</span>
+                                <span class="period">/мес</span>
                             </div>
-                            <p class="plan-description">Расширенные возможности для профессионалов</p>
                         </div>
                         <div class="card-body">
                             <ul class="features-list">
-                                <li><i class="fas fa-check"></i> Доступ к WindexAI Pro</li>
-                                <li><i class="fas fa-check"></i> Безлимитные запросы</li>
+                                <li><i class="fas fa-check"></i> WindexAI Pro модель</li>
+                                <li><i class="fas fa-check"></i> 1000 запросов/день</li>
+                                <li><i class="fas fa-check"></i> Голосовые сообщения</li>
+                                <li><i class="fas fa-check"></i> Обработка документов</li>
+                                <li><i class="fas fa-check"></i> AI генератор сайтов</li>
                                 <li><i class="fas fa-check"></i> Приоритетная поддержка</li>
+                            </ul>
+                            <button class="btn btn-secondary plan-btn" onclick="selectPlan('plus')">
+                                Выбрать Plus
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pro Plan -->
+                    <div class="pricing-card pro-card featured">
+                        <div class="card-header">
+                            <div class="plan-badge">Премиум</div>
+                            <h3 class="plan-name">Pro</h3>
+                            <div class="plan-price">
+                                <span class="currency">₽</span>
+                                <span class="amount">2,990</span>
+                                <span class="period">/мес</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <ul class="features-list">
+                                <li><i class="fas fa-check"></i> WindexAI Pro модель</li>
+                                <li><i class="fas fa-check"></i> Безлимитные запросы</li>
                                 <li><i class="fas fa-check"></i> Голосовые сообщения</li>
                                 <li><i class="fas fa-check"></i> Обработка документов</li>
                                 <li><i class="fas fa-check"></i> AI редактор сайтов</li>
                                 <li><i class="fas fa-check"></i> Автоматический деплой</li>
-                                <li><i class="fas fa-check"></i> Расширенная аналитика</li>
                             </ul>
                             <button class="btn btn-primary plan-btn" onclick="selectPlan('pro')">
                                 Выбрать Pro
                             </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- FAQ Section -->
-                <div class="faq-section">
-                    <h2 class="faq-title">Часто задаваемые вопросы</h2>
-                    <div class="faq-list">
-                        <div class="faq-item">
-                            <div class="faq-question">
-                                <h4>Можно ли изменить план в любое время?</h4>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="faq-answer">
-                                <p>Да, вы можете изменить или отменить подписку в любое время. Изменения вступят в силу в следующем биллинговом цикле.</p>
-                            </div>
-                        </div>
-                        <div class="faq-item">
-                            <div class="faq-question">
-                                <h4>Есть ли пробный период?</h4>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="faq-answer">
-                                <p>Да, мы предлагаем 14-дневный бесплатный пробный период для всех платных планов без обязательств.</p>
-                            </div>
-                        </div>
-                        <div class="faq-item">
-                            <div class="faq-question">
-                                <h4>Какие способы оплаты принимаются?</h4>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="faq-answer">
-                                <p>Мы принимаем все основные кредитные карты, PayPal, банковские переводы и корпоративные счета.</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -160,7 +147,71 @@
                 alert('Вы уже используете бесплатный план!');
                 return;
             }
-            
+
+            if (plan === 'plus') {
+                try {
+                    // Показываем индикатор загрузки
+                    const plusButton = document.querySelector('button[onclick="selectPlan(\'plus\')"]');
+                    const originalText = plusButton.textContent;
+                    plusButton.textContent = 'Активация...';
+                    plusButton.disabled = true;
+
+                    // Получаем токен авторизации
+                    const token = localStorage.getItem('windexai_token');
+                    if (!token) {
+                        alert('Необходимо войти в систему для активации подписки');
+                        window.location.href = '/';
+                        return;
+                    }
+
+                    // Отправляем запрос на активацию Plus подписки
+                    const response = await fetch('/api/auth/activate-subscription', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ plan: 'plus' })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        // Успешная активация
+                        showSuccessNotification(result.message);
+
+                        // Обновляем кнопку
+                        plusButton.textContent = 'Активен';
+                        plusButton.classList.remove('btn-secondary');
+                        plusButton.classList.add('btn-success');
+
+                        // Обновляем статус на странице
+                        updateSubscriptionStatus(result.plan, result.expires_at);
+
+                        // Перенаправляем на главную страницу через 2 секунды с параметром обновления
+                        setTimeout(() => {
+                            window.location.href = '/?subscription_activated=plus';
+                        }, 2000);
+
+                    } else {
+                        // Ошибка активации
+                        showErrorNotification(result.message || 'Ошибка активации подписки');
+                        plusButton.textContent = originalText;
+                        plusButton.disabled = false;
+                    }
+
+                } catch (error) {
+                    console.error('Ошибка активации подписки:', error);
+                    showErrorNotification('Ошибка сети при активации подписки');
+
+                    // Восстанавливаем кнопку
+                    const plusButton = document.querySelector('button[onclick="selectPlan(\'plus\')"]');
+                    plusButton.textContent = 'Выбрать Plus';
+                    plusButton.disabled = false;
+                }
+                return;
+            }
+
             if (plan === 'pro') {
                 try {
                     // Показываем индикатор загрузки
@@ -270,17 +321,35 @@
         
         // Функция для обновления статуса подписки на странице
         function updateSubscriptionStatus(plan, expiresAt) {
+            if (plan === 'plus') {
+                // Обновляем заголовок Plus плана
+                const plusCard = document.querySelector('.plus-card');
+                const planName = plusCard.querySelector('.plan-name');
+                planName.innerHTML = 'WindexsAI Plus <span class="badge badge-success">Активен</span>';
+
+                // Показываем дату истечения
+                if (expiresAt) {
+                    const expiresDate = new Date(expiresAt);
+                    const expiresText = `Действует до: ${expiresDate.toLocaleDateString('ru-RU')}`;
+
+                    const planDescription = plusCard.querySelector('.plan-description');
+                    if (planDescription) {
+                        planDescription.innerHTML = `${planDescription.textContent}<br><small class="text-success">${expiresText}</small>`;
+                    }
+                }
+            }
+
             if (plan === 'pro') {
                 // Обновляем заголовок Pro плана
                 const proCard = document.querySelector('.pro-card');
                 const planName = proCard.querySelector('.plan-name');
                 planName.innerHTML = 'WindexsAI Pro <span class="badge badge-success">Активен</span>';
-                
+
                 // Показываем дату истечения
                 if (expiresAt) {
                     const expiresDate = new Date(expiresAt);
                     const expiresText = `Действует до: ${expiresDate.toLocaleDateString('ru-RU')}`;
-                    
+
                     const planDescription = proCard.querySelector('.plan-description');
                     planDescription.innerHTML = `${planDescription.textContent}<br><small class="text-success">${expiresText}</small>`;
                 }

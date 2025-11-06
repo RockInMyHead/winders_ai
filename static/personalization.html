@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Персонализация - WindexsAI</title>
+    <link rel="icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .personalization-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem 0;
+        }
+
+        .personalization-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .personalization-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .personalization-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .personalization-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .personalization-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .style-section h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .style-section h3::before {
+            content: "🎨";
+            font-size: 1.5rem;
+        }
+
+        .style-description {
+            font-size: 1rem;
+            color: #4a5568;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .style-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .style-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .style-option:hover {
+            border-color: #20993b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(32, 153, 59, 0.15);
+        }
+
+        .style-option.selected {
+            border-color: #20993b;
+            background: linear-gradient(135deg, #20993b, #22c55e);
+            color: white;
+        }
+
+        .style-option.selected::after {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            color: #20993b;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .style-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .style-example {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        .custom-instructions {
+            margin-top: 2rem;
+        }
+
+        .custom-instructions h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .custom-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .custom-textarea:focus {
+            outline: none;
+            border-color: #20993b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn-custom {
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #20993b, #22c55e);
+            color: white;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(32, 153, 59, 0.3);
+        }
+
+        .btn-secondary-custom {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #cbd5e0;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-link:hover {
+            background: white;
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .personalization-container {
+                padding: 0 0.5rem;
+            }
+
+            .personalization-header h1 {
+                font-size: 2rem;
+            }
+
+            .personalization-card {
+                padding: 1.5rem;
+            }
+
+            .style-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .back-link {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 1rem;
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="personalization-page">
+        <div class="personalization-container">
+            <a href="/" class="back-link">
+                <span>←</span>
+                Назад к чату
+            </a>
+
+            <div class="personalization-header">
+                <h1>Базовый стиль и тон</h1>
+                <p>Укажите стиль и тон, который ChatGPT будет использовать при ответе.</p>
+            </div>
+
+            <div class="personalization-card">
+                <div class="style-section">
+                    <h3>По умолчанию</h3>
+                    <p class="style-description">Выберите стиль общения, который будет использоваться по умолчанию для всех ваших разговоров.</p>
+
+                    <div class="style-grid">
+                        <div class="style-option selected" data-style="default">
+                            <div class="style-name">По умолчанию</div>
+                            <div class="style-example">Стандартный стиль общения</div>
+                        </div>
+
+                        <div class="style-option" data-style="chatty">
+                            <div class="style-name">Болтливый</div>
+                            <div class="style-example">Дружелюбный и разговорчивый</div>
+                        </div>
+
+                        <div class="style-option" data-style="witty">
+                            <div class="style-name">Остроумный</div>
+                            <div class="style-example">С юмором и остроумием</div>
+                        </div>
+
+                        <div class="style-option" data-style="direct">
+                            <div class="style-name">Откровенный</div>
+                            <div class="style-example">Прямолинейный и честный</div>
+                        </div>
+
+                        <div class="style-option" data-style="encouraging">
+                            <div class="style-name">Ободряющий</div>
+                            <div class="style-example">Поддерживающий и мотивирующий</div>
+                        </div>
+
+                        <div class="style-option" data-style="genz">
+                            <div class="style-name">Поколение Z</div>
+                            <div class="style-example">Современный сленг и тренды</div>
+                        </div>
+                    </div>
+
+                    <div class="custom-instructions">
+                        <h4>Пользовательские инструкции</h4>
+                        <p class="style-description">Добавьте свои собственные инструкции для стиля общения.</p>
+                        <textarea class="custom-textarea" placeholder="Например: 'Отвечай как опытный программист с 10-летним стажем, используй технические термины, но объясняй сложные концепции простыми словами...'"></textarea>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-custom btn-primary-custom" onclick="savePersonalization()">
+                            Сохранить настройки
+                        </button>
+                        <button class="btn-custom btn-secondary-custom" onclick="resetToDefault()">
+                            Сбросить к умолчанию
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="personalization-card">
+                <div class="style-section">
+                    <h3>Псевдоним</h3>
+                    <p class="style-description">Установите псевдоним для вашего профиля.</p>
+
+                    <div class="custom-instructions">
+                        <input type="text" class="custom-textarea" placeholder="Введите ваш псевдоним" style="min-height: 50px;">
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-custom btn-primary-custom" onclick="saveAlias()">
+                            Сохранить псевдоним
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="personalization-card">
+                <div class="style-section">
+                    <h3>Профессия</h3>
+                    <p class="style-description">Укажите вашу профессию для более персонализированных ответов.</p>
+
+                    <div class="custom-instructions">
+                        <input type="text" class="custom-textarea" placeholder="Например: Разработчик, дизайнер, менеджер..." style="min-height: 50px;">
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-custom btn-primary-custom" onclick="saveProfession()">
+                            Сохранить профессию
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="personalization-card">
+                <div class="style-section">
+                    <h3>Больше о вас</h3>
+                    <p class="style-description">Расскажите больше о себе для более точных и персонализированных ответов.</p>
+
+                    <div class="custom-instructions">
+                        <textarea class="custom-textarea" placeholder="Расскажите о ваших интересах, хобби, опыте работы, целях и т.д. Чем больше информации, тем лучше AI сможет адаптировать свои ответы под вас."></textarea>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-custom btn-primary-custom" onclick="saveAbout()">
+                            Сохранить информацию
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Выбор стиля
+        document.querySelectorAll('.style-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.style-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Функции сохранения
+        function savePersonalization() {
+            const selectedStyle = document.querySelector('.style-option.selected').dataset.style;
+            const customInstructions = document.querySelector('.custom-instructions textarea').value;
+
+            // Здесь будет логика сохранения в localStorage или отправки на сервер
+            showNotification('Настройки персонализации сохранены!', 'success');
+        }
+
+        function resetToDefault() {
+            document.querySelectorAll('.style-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('[data-style="default"]').classList.add('selected');
+            document.querySelector('.custom-instructions textarea').value = '';
+            showNotification('Настройки сброшены к умолчанию', 'success');
+        }
+
+        function saveAlias() {
+            const alias = document.querySelector('input[placeholder*="псевдоним"]').value;
+            if (alias.trim()) {
+                showNotification('Псевдоним сохранен!', 'success');
+            } else {
+                showNotification('Введите псевдоним', 'error');
+            }
+        }
+
+        function saveProfession() {
+            const profession = document.querySelector('input[placeholder*="профессия"]').value;
+            if (profession.trim()) {
+                showNotification('Профессия сохранена!', 'success');
+            } else {
+                showNotification('Введите профессию', 'error');
+            }
+        }
+
+        function saveAbout() {
+            const about = document.querySelector('textarea[placeholder*="интересах"]').value;
+            if (about.trim()) {
+                showNotification('Информация сохранена!', 'success');
+            } else {
+                showNotification('Введите информацию о себе', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <div class="notification-text">${message}</div>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
