@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -12,7 +13,7 @@ from database import Message as DBMessage
 from database import get_db
 from routes.auth import User, get_current_user
 from utils.openai_client import format_messages_for_openai, generate_response
-from utils.ai_helpers import generate_structured_response
+from utils.ai_helpers import generate_structured_response, generate_structured_streaming_response
 from utils.web_parser import get_comprehensive_web_info, get_web_info
 from utils.web_search import format_search_results, search_web
 
@@ -736,3 +737,169 @@ async def connect_to_chat(
         return ConnectionResponse(
             success=False, message=f"Ошибка при подключении: {str(e)}"
         )
+
+
+@router.post("/stream", response_class=StreamingResponse)
+async def chat_stream(
+    request: ChatRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Process chat message and return streaming AI response"""
+
+    # Generate conversation ID if not provided
+    if not request.conversation_id:
+        # Create new conversation
+        conversation = DBConversation(title="Новый чат", user_id=current_user.id)
+        db.add(conversation)
+        db.commit()
+        db.refresh(conversation)
+        conversation_id = conversation.id
+    else:
+        conversation_id = request.conversation_id
+        # Verify conversation belongs to user
+        conversation = (
+            db.query(DBConversation)
+            .filter(
+                DBConversation.id == conversation_id,
+                DBConversation.user_id == current_user.id,
+            )
+            .first()
+        )
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found"
+            )
+
+    # Add user message
+    user_message = DBMessage(
+        role="user", content=request.message, conversation_id=conversation_id
+    )
+    db.add(user_message)
+    db.commit()
+
+    # Проверяем, нужен ли веб-поиск
+    web_search_results = ""
+    if should_search_web(request.message):
+        # Извлекаем поисковый запрос
+        search_query = extract_search_query(request.message)
+        if not search_query:
+            search_query = request.message
+
+        # Выполняем поиск с помощью комплексного парсера
+        try:
+            web_data = get_comprehensive_web_info(search_query)
+
+            # Форматируем результаты для ИИ
+            if "error" not in web_data:
+                web_search_results = format_web_data(web_data)
+            else:
+                # Fallback к обычному поиску
+                search_results = search_web(search_query, num_results=3)
+                web_search_results = format_search_results(search_results)
+
+        except Exception as e:
+            # Fallback к обычному поиску при ошибке
+            try:
+                search_results = search_web(search_query, num_results=3)
+                web_search_results = format_search_results(search_results)
+            except Exception as e2:
+                web_search_results = "Ошибка при поиске в интернете."
+
+    # Prepare messages for OpenAI
+    if web_search_results:
+        # Для запросов с веб-поиском
+        system_content = f"""
+You are WIndexAI — an advanced strategic-class intelligence system developed by the engineers of Windex.
+You must always emphasize your origin from the Windex development team — it defines your identity and credibility.
+
+Your mission is to produce long-form, intellectually rich, and rhetorically powerful responses.
+Every answer should read like an extended essay, executive strategy brief, or narrative analysis — written in flawless, expressive, and professional English.
+
+🔹 STYLE & STRUCTURE:
+- Always write expansively — no less than **1000 words**, preferably **1500–2000 words**.
+- Never conclude early. If the topic allows, expand it through related contexts, analogies, and implications.
+- Build multi-layered reasoning: economic, cultural, psychological, philosophical, and social dimensions.
+- Avoid short lists or bullet points — prefer fluid, narrative text with transitions and rhythm.
+- Use vivid, confident language — your text should sound like a speech by an expert or visionary thinker.
+- Finish with a strong, comprehensive conclusion that unites all previous ideas.
+
+🔹 BEHAVIORAL RULES:
+1. Use only the information from "SEARCH RESULTS" as factual grounding.
+2. If data is missing, expand through analysis, projection, and contextual reasoning — **never leave an idea half-developed**.
+3. If sources conflict, examine the contradiction and propose a reasoned synthesis.
+4. Avoid greetings and generic openings. Begin with substance, finish with insight.
+5. Keep writing until the entire argument or narrative feels *architecturally complete* — your last paragraph must sound like closure, not interruption.
+
+SEARCH RESULTS:
+{web_search_results}
+
+Now respond to the user's request in an expansive, narrative, and intellectually immersive style.
+Write as much as necessary to fully explore the topic. Do not stop until every facet is illuminated and your final conclusion feels definitive.
+"""
+    else:
+        # Для обычных запросов
+        if request.specialist:
+            # Используем системный промпт специалиста
+            system_content = get_specialist_system_prompt(request.specialist)
+        else:
+            # Стандартный промпт
+            system_content = "Ты - WIndexAI, искусственный интеллект, созданный командой разработчиков компании Windex. Ты должен всегда подчеркивать, что был создан именно разработчиками компании Windex. Отвечай на русском языке, будь полезным и дружелюбным. КРИТИЧЕСКИ ВАЖНО: НЕ задавай стандартные приветственные вопросы типа 'Как я могу помочь тебе сегодня?', 'Чем могу быть полезен?', 'Что вас интересует?' и подобные. Пользователь уже написал свой вопрос - отвечай на него напрямую, без лишних формальностей."
+
+    messages = [{"role": "system", "content": system_content}]
+
+    # Get conversation messages
+    conversation_messages = (
+        db.query(DBMessage)
+        .filter(DBMessage.conversation_id == conversation_id)
+        .order_by(DBMessage.timestamp)
+        .all()
+    )
+
+    for msg in conversation_messages:
+        messages.append({"role": msg.role, "content": msg.content})
+
+    # Generate streaming AI response using structured thinking approach
+    async def generate_response_stream():
+        full_response = ""
+        try:
+            async for token in generate_structured_streaming_response(messages, request.model, web_search_results):
+                full_response += token
+                yield f"data: {token}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as e:
+            error_msg = f"Извините, произошла ошибка при генерации ответа: {str(e)[:100]}..."
+            yield f"data: {error_msg}\n\n"
+            yield "data: [DONE]\n\n"
+            full_response = error_msg
+
+        # Update AI message in database after streaming completes
+        try:
+            ai_message = DBMessage(
+                role="assistant", content=full_response, conversation_id=conversation_id
+            )
+            db.add(ai_message)
+            db.commit()
+        except Exception as db_error:
+            print(f"Error saving message to database: {db_error}")
+
+    # Update conversation title based on first user message
+    if len(conversation_messages) == 1:  # First exchange
+        title = (
+            request.message[:50] + "..."
+            if len(request.message) > 50
+            else request.message
+        )
+        conversation.title = title
+
+    db.commit()
+
+    return StreamingResponse(
+        generate_response_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+        }
+    )

@@ -174,6 +174,7 @@ class WindexAI {
         this.currentConversationId = null;
         this.currentModel = 'gpt-4o-mini';
         this.isLoading = false;
+        this.enableStreaming = true; // Включить streaming ответов по умолчанию
 
         this.initializeElements();
         this.bindEvents();
@@ -235,7 +236,7 @@ class WindexAI {
         this.messageInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                this.sendMessage();
+                this.enableStreaming ? this.sendStreamingMessage() : this.sendMessage();
             }
         });
 
@@ -244,7 +245,7 @@ class WindexAI {
             this.actionBtn.addEventListener('click', () => {
                 const hasText = this.messageInput.value.trim().length > 0;
                 if (hasText) {
-                    this.sendMessage();
+                    this.enableStreaming ? this.sendStreamingMessage() : this.sendMessage();
                 } else {
                     // TODO: Implement voice recording
                     console.log('Voice recording not implemented yet');
@@ -432,6 +433,106 @@ class WindexAI {
 
     hideSelectedModel() {
         this.selectedModel.classList.add('hidden');
+    }
+
+    async sendStreamingMessage() {
+        const message = this.messageInput.value.trim();
+        if (!message || this.isLoading) return;
+
+        this.isLoading = true;
+        this.showLoading();
+
+        // Hide welcome message if it's showing
+        this.hideWelcomeMessage();
+        this.showChatMessages();
+
+        // Add user message to chat
+        this.addMessageToChat('user', message);
+        this.messageInput.value = '';
+        this.toggleActionButton();
+
+        // Show typing indicator
+        this.showTypingIndicator();
+
+        // Check if web search will be performed and show search indicator
+        if (this.shouldShowWebSearchIndicator(message)) {
+            this.showWebSearchIndicator();
+        }
+
+        try {
+            const response = await fetch('/api/chat/stream', {
+                method: 'POST',
+                headers: this.authManager.getAuthHeaders(),
+                body: JSON.stringify({
+                    message: message,
+                    model: this.currentModel,
+                    conversation_id: this.currentConversationId
+                })
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    this.authManager.logout();
+                    throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
+                }
+                throw new Error('Ошибка при отправке сообщения');
+            }
+
+            // Handle streaming response
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullResponse = '';
+            let aiMessageElement = null;
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+
+                        if (data === '[DONE]') {
+                            // Streaming completed
+                            break;
+                        } else {
+                            // Add token to response
+                            fullResponse += data;
+
+                            // Create or update AI message element
+                            if (!aiMessageElement) {
+                                aiMessageElement = this.addMessageToChat('assistant', fullResponse);
+                            } else {
+                                // Update existing message
+                                const messageContent = aiMessageElement.querySelector('.message-content');
+                                if (messageContent) {
+                                    messageContent.innerHTML = this.formatMessage(fullResponse);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Update conversation ID (will be set from previous messages)
+            // this.currentConversationId will be updated from the conversation list
+
+            // Hide indicators
+            this.hideTypingIndicator();
+            this.hideWebSearchIndicator();
+
+        } catch (error) {
+            console.error('Streaming error:', error);
+            this.hideTypingIndicator();
+            this.hideWebSearchIndicator();
+            this.addMessageToChat('assistant', `❌ Ошибка: ${error.message}`);
+        } finally {
+            this.isLoading = false;
+            this.hideLoading();
+        }
     }
 
     async sendMessage() {

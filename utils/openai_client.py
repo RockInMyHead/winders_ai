@@ -105,6 +105,63 @@ def get_model_config(model_name: str) -> Dict[str, Any]:
     return get_ai_model_config(model_name)
 
 
+async def generate_streaming_response(
+    messages: List[Dict[str, str]], model: str = "gpt-4o-mini"
+):
+    """Generate streaming AI response using OpenAI API"""
+    if not async_openai_client:
+        yield "⚠️ OpenAI API ключ не настроен. Пожалуйста, добавьте ваш API ключ в файл .env"
+        return
+
+    try:
+        # Get generation parameters from new config
+        gen_params = get_generation_params(model)
+
+        # Prepare enhanced messages
+        enhanced_messages = []
+
+        # Add system prompt
+        system_prompt = get_system_prompt()
+        enhanced_messages.append(system_prompt)
+
+        # Process user messages and enhance the last user message
+        for i, msg in enumerate(messages):
+            if msg.get("role") == "user" and i == len(messages) - 1:
+                # This is the last user message - enhance it
+                enhanced_user_prompt = get_enhanced_user_prompt(msg["content"])
+                enhanced_messages.append(
+                    {"role": "user", "content": enhanced_user_prompt}
+                )
+            else:
+                # Keep other messages as is
+                enhanced_messages.append(msg)
+
+        # Create streaming response
+        stream = await async_openai_client.chat.completions.create(
+            model=gen_params["model"],
+            messages=enhanced_messages,
+            max_tokens=gen_params["max_tokens"],
+            temperature=gen_params["temperature"],
+            top_p=gen_params["top_p"],
+            stream=True,
+        )
+
+        async for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                yield chunk.choices[0].delta.content
+
+    except Exception as e:
+        # Более детальная обработка ошибок
+        if "max_tokens" in str(e):
+            yield "Извините, произошла ошибка с настройками модели. Попробуйте еще раз."
+        elif "rate_limit" in str(e).lower():
+            yield "Превышен лимит запросов. Пожалуйста, подождите немного и попробуйте снова."
+        elif "invalid_api_key" in str(e).lower():
+            yield "Ошибка API ключа. Обратитесь к администратору."
+        else:
+            yield f"Извините, произошла ошибка при генерации ответа: {str(e)[:100]}..."
+
+
 async def generate_response(
     messages: List[Dict[str, str]], model: str = "gpt-4o-mini"
 ) -> str:
