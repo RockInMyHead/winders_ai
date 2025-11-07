@@ -12,6 +12,7 @@ from database import Message as DBMessage
 from database import get_db
 from routes.auth import User, get_current_user
 from utils.openai_client import format_messages_for_openai, generate_response
+from utils.ai_helpers import generate_structured_response
 from utils.web_parser import get_comprehensive_web_info, get_web_info
 from utils.web_search import format_search_results, search_web
 
@@ -411,9 +412,9 @@ Write as much as necessary to fully explore the topic. Do not stop until every f
     for msg in conversation_messages:
         messages.append({"role": msg.role, "content": msg.content})
 
-    # Generate AI response using OpenAI
+    # Generate AI response using structured thinking approach
     try:
-        ai_response = await generate_response(messages, request.model)
+        ai_response = await generate_structured_response(messages, request.model, web_search_results)
 
         # Если это запрос с веб-поиском, переводим ответ на русский
         if web_search_results:
